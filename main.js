@@ -4,6 +4,11 @@ const fs = require('fs')
 const {spawn} = require('child_process')
 const path = require('path')
 
+function isFunction(functionToCheck) {
+ var getType = {};
+ return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
+}
+
 module.exports = (glob, options) => {
   options = options || {}
   let browserWindows = []
@@ -29,6 +34,11 @@ module.exports = (glob, options) => {
    * defined in given 'glob' is changed.
    */
   let onChange = () => {
+    // Let user execute some statements before reloading browserWindows
+    if (isFunction(options.callback)) {
+      options.callback()
+    }
+
     browserWindows.forEach((bw) => {
       bw.webContents.reloadIgnoringCache()
     })
